@@ -1,5 +1,6 @@
 package com.example.todocomponent;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -48,6 +52,7 @@ public class TodoListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
     }
 
@@ -64,10 +69,37 @@ public class TodoListFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.todo_list_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.new_todo:
+
+                Todo todo = new Todo();
+                todo.setDetail("");
+                TodoModel.getInstance().addTodo(todo);
+
+                Intent intent = TodoPagerActivity.makeIntent(getActivity(), todo.getId());
+                //              Intent intent = TodoActivity.newIntent(getActivity(), todo.getId());
+                startActivity(intent);
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         todoModel = TodoModel.getInstance();
-        adapter = new TodoListAdapter(todoModel.getTodosList());
+        adapter = new TodoListAdapter(todoModel.getTodosList(), getActivity());
         recyclerView.setAdapter(adapter);
     }
 }
